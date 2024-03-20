@@ -20,6 +20,7 @@ public interface ProductService {
     void  editProductByUuid(String uuid, ProductEditRequest request );
 
     boolean deleteProductById(Integer id);
+    void deleteProductBYUuid(String uuid);
 
 
 

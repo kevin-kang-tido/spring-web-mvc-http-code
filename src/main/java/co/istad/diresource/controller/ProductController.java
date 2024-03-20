@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
     private  final ProductService productService;
 
@@ -56,5 +56,13 @@ public class ProductController {
     Boolean deleteProductById(@PathVariable Integer id){
         return productService.deleteProductById(id);
     }
+    // testing delete by uuid 
+    @DeleteMapping("/delete/uuid/{uuid}")
+    void deleteProductByUuid(@PathVariable String uuid){
+        productService.deleteProductBYUuid(uuid);
+
+    }
+
+
 
 }

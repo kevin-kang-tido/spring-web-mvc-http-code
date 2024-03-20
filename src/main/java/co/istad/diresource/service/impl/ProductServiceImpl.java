@@ -126,8 +126,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean deleteProductById(Integer id) {
-        
         return products.removeIf(product -> product.getId().equals(id));
+    }
+
+    @Override
+    public void deleteProductBYUuid(String uuid) {
+        products.removeIf(product -> product.getUuid().equals(uuid));
     }
 
 }
