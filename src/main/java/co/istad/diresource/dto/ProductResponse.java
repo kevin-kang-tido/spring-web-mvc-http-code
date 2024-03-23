@@ -1,6 +1,6 @@
 package co.istad.diresource.dto;
 
-public record ProductDto(
+public record ProductRequest(
         String uuid,
         Integer id,
         String name,
