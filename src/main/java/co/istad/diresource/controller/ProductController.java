@@ -3,8 +3,11 @@ package co.istad.diresource.controller;
 import co.istad.diresource.dto.ProductCreateRequest;
 import co.istad.diresource.dto.ProductEditRequest;
 import co.istad.diresource.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,13 +19,28 @@ public class ProductController {
     private  final ProductService productService;
 
     @GetMapping
-    Map<String, Object> findProducts(@RequestParam(required = false, defaultValue = "") String name,
-                                         @RequestParam(required = false, defaultValue = "true") Boolean status) {
-        return Map.of(
-                "message", "Products have been found",
-                "data", productService.findProducts(name, status)
+    ResponseEntity<?> findProducts(@RequestParam(required = false, defaultValue = "") String name,
+                                   @RequestParam(required = false, defaultValue = "true") Boolean status) {
+        return new ResponseEntity<>(
+                Map.of(
+                        "message", "Products have been found",
+                        "data", productService.findProducts(name, status)
+                ),HttpStatus.ACCEPTED
         );
+
     }
+
+
+
+
+
+//    Map<String, Object> findProducts(@RequestParam(required = false, defaultValue = "") String name,
+//                                         @RequestParam(required = false, defaultValue = "true") Boolean status) {
+//        return Map.of(
+//                "message", "Products have been found",
+//                "data", productService.findProducts(name, status)
+//        );
+//    }
 
     @GetMapping("/{id}")
     Map<String, Object> findProductById(@PathVariable Integer id) {
@@ -41,12 +59,14 @@ public class ProductController {
     }
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    void createNewProduct(@RequestBody ProductCreateRequest request){
-        System.out.println("This is Request : " + request);
-        productService.createNewProduct(request);
-    }
-    // controller for edit product by uuid
+        void createNewProduct(@Valid @RequestBody ProductCreateRequest request) {
+            System.out.println("REQUEST: " + request);
+            productService.createNewProduct(request);
 
+       }
+
+
+    // controller for edit product by uuid
     @PutMapping("/uuid/{uuid}")
     void editProductByUuid(@PathVariable String uuid, @RequestBody ProductEditRequest request){
         productService.editProductByUuid(uuid,request);

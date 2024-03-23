@@ -1,5 +1,9 @@
 package co.istad.diresource.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,13 +15,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
+
+@Entity
+@Table(name = "products")
 public class Product {
-    private  String uuid;
+
+    @Id
     private Integer id;
+    private  String uuid;
     private  String name;
     private  Double price;
     private  Boolean  status;
     private LocalDateTime importDate;
     private  Integer Qty;
+
+    @ManyToOne
+    private Category category;
 
 }
