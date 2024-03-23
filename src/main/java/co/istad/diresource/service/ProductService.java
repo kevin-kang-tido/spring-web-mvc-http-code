@@ -1,17 +1,17 @@
 package co.istad.diresource.service;
 
 import co.istad.diresource.dto.ProductCreateRequest;
-import co.istad.diresource.dto.ProductDto;
+import co.istad.diresource.dto.ProductResponse;
 import co.istad.diresource.dto.ProductEditRequest;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 public interface ProductService {
-    List<ProductDto> findProducts(String name, Boolean status);
-    ProductDto findProductById(Integer id);
+    List<ProductResponse> findAllProducts();
+    List<ProductResponse> findProducts(String name, Boolean status);
+    ProductResponse findProductById(Integer id);
 
-    ProductDto findProductByUuid(String uuid);
+    ProductResponse findProductByUuid(String uuid);
 
     void createNewProduct(ProductCreateRequest request);
 
@@ -19,7 +19,8 @@ public interface ProductService {
     // Product Edit Request we get it from dto productEdiRequest
     void  editProductByUuid(String uuid, ProductEditRequest request );
 
-    boolean deleteProductById(Integer id);
+    void deleteProductById(Integer id);
+    ProductResponse editProductById(Integer id,ProductEditRequest request);
     void deleteProductBYUuid(String uuid);
 
 

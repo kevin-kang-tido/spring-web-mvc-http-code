@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @NoArgsConstructor
 // pojo class
 @Entity
-@Table(name = "categoties")
+@Table(name = "categories")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // use to auto increase of id

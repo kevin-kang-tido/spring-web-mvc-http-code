@@ -1,137 +1,126 @@
 package co.istad.diresource.service.impl;
 
 import co.istad.diresource.dto.ProductCreateRequest;
-import co.istad.diresource.dto.ProductDto;
+import co.istad.diresource.dto.ProductResponse;
 import co.istad.diresource.dto.ProductEditRequest;
+import co.istad.diresource.model.Category;
 import co.istad.diresource.model.Product;
+import co.istad.diresource.repository.CategoryRepository;
+import co.istad.diresource.repository.ProductRepository;
+import co.istad.diresource.service.CategoryService;
 import co.istad.diresource.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    private List<Product> products;
 
-    public ProductServiceImpl() {
-        products = new ArrayList<>();
-        Product p1 = new Product();
-        p1.setId(1);
-        p1.setUuid(UUID.randomUUID().toString());
-        p1.setName("iPhone 14 Pro Max");
-        p1.setPrice(1300.0);
-        p1.setQty(1);
-        p1.setImportDate(LocalDateTime.now());
-        p1.setStatus(true);
-        Product p2 = new Product();
-        p2.setId(2);
-        p2.setUuid(UUID.randomUUID().toString());
-        p2.setName("macBook M3 RAM 30GB");
-        p2.setPrice(2600.0);
-        p2.setQty(2);
-        p2.setImportDate(LocalDateTime.now());
-        p2.setStatus(true);
-        Product p3 = new Product();
-        p3.setId(3);
-        p3.setUuid(UUID.randomUUID().toString());
-        p3.setName("macBook M3 RAM 30GB");
-        p3.setPrice(2600.0);
-        p3.setQty(2);
-        p3.setImportDate(LocalDateTime.now());
-        p3.setStatus(true);
-        products.add(p1);
-        products.add(p2);
-        products.add(p3);
-    }
+    private final  ProductRepository productRepository;
+
 
     @Override
-    public List<ProductDto> findProducts(String name, Boolean status) {
+    public List<ProductResponse> findAllProducts() {
+        List<Product> products = productRepository.findAll();
+
         return products.stream()
-                .filter(Product::getStatus)
-                .map(product -> new ProductDto(
+                .map(product -> new ProductResponse(
                         product.getUuid(),
                         product.getId(),
                         product.getName(),
                         product.getPrice(),
                         product.getQty()
-                ))
-                .toList()
-        ;
+                )).toList();
+
     }
 
     @Override
-    public ProductDto findProductById(Integer id) {
-        return products.stream()
-                .filter(product -> product.getId().equals(id) &&
-                        product.getStatus().equals(true))
-                .map(product -> new ProductDto(
-                        product.getUuid(),
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getQty()
-                ))
-                .findFirst()
-                .orElseThrow();
+    public List<ProductResponse> findProducts(String name, Boolean status) {
 
+        return null;
     }
 
+    // find product by id
+    @Override
+    public ProductResponse findProductById(Integer id) {
+       Product product = productRepository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Product is not found!"
+                ));
+        return new ProductResponse(
+                product.getUuid(),
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getQty()
+        );
+    }
 
     @Override
-    public ProductDto findProductByUuid(String uuid) {
-        return products.stream()
-                .filter(product -> product.getUuid().equals(uuid) &&
-                        product.getStatus().equals(true))
-                .map(product -> new ProductDto(
-                        product.getUuid(),
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getQty()
-                ))
-                .findFirst()
-                .orElseThrow();
-
+    public ProductResponse findProductByUuid(String uuid) {
+        return null;
     }
 
-    // create new products
     @Override
     public void createNewProduct(ProductCreateRequest request) {
-        Product newProduct = new Product();
-        newProduct.setName(request.name());
-        newProduct.setPrice(request.price());
-        newProduct.setQty(request.qty());
-        newProduct.setId(products.size() +1 );
-        newProduct.setUuid(UUID.randomUUID().toString());
-        newProduct.setImportDate(LocalDateTime.now());
-        newProduct.setStatus(true);
-        products.add(newProduct);
+        // check product gonna create hava or not
+        if (productRepository.existsByName(request.name())){
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Product name already existed!"
+            );
+        }
+
+        Product product = new Product();
+        product.setName(request.name());
+        product.setPrice(request.price());
+        product.setQty(request.qty());
+
+        productRepository.save(product);
+
+
     }
 
-    // override for edit user by uuid
     @Override
     public void editProductByUuid(String uuid, ProductEditRequest request) {
-        // check the uuid have or not
-       long count =  products.stream()
-               .filter(product -> product.getUuid().equals(uuid))
-               .peek(oldProduct -> {
-                   oldProduct.setName(request.name());
-                   oldProduct.setPrice(request.price());
-               }).count();
-        System.out.println("Affected row : "+count);
+
     }
 
     @Override
-    public boolean deleteProductById(Integer id) {
-        return products.removeIf(product -> product.getId().equals(id));
+    public void deleteProductById(Integer id) {
+        if (!productRepository.existsById(id)){
+            throw  new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Product id is  not found!"
+            );
+        }
+
+        productRepository.deleteById(id);
+
+    }
+
+    @Override
+    public ProductResponse editProductById(Integer id, ProductEditRequest request) {
+       Product product = productRepository.findById(id)
+               .orElseThrow(()-> new ResponseStatusException(
+                       HttpStatus.NOT_FOUND,
+                       "Product is not found!"
+               ));
+       product.setUuid(request.uuid());
+       product.setName(request.name());
+       product.setPrice(request.price());
+       productRepository.save(product);
+
+        return this.findProductById(id);
     }
 
     @Override
     public void deleteProductBYUuid(String uuid) {
-        products.removeIf(product -> product.getUuid().equals(uuid));
-    }
 
+    }
 }

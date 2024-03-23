@@ -56,7 +56,6 @@ public class CategoryServiceImpl implements CategoryService {
                     "Category name already existed!"
             );
         }
-
         Category category = new Category();
         // dto pattern
         category.setName(request.name());
